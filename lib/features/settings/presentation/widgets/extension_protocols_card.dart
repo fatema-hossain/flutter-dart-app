@@ -1,24 +1,33 @@
 import 'package:flutter/material.dart';
 
-class ExtensionProtocolsCard extends StatefulWidget {
-  const ExtensionProtocolsCard({super.key});
+class ExtensionProtocolsCard extends StatelessWidget {
+  const ExtensionProtocolsCard({
+    super.key,
+    required this.visualAssets,
+    required this.documents,
+    required this.sourceCode,
+    required this.archives,
+    required this.onVisualAssetsChanged,
+    required this.onDocumentsChanged,
+    required this.onSourceCodeChanged,
+    required this.onArchivesChanged,
+  });
 
-  @override
-  State<ExtensionProtocolsCard> createState() => _ExtensionProtocolsCardState();
-}
-
-class _ExtensionProtocolsCardState extends State<ExtensionProtocolsCard> {
-  bool _visualAssets = true;
-  bool _documents = false;
-  bool _sourceCode = true;
-  bool _archives = true;
+  final bool visualAssets;
+  final bool documents;
+  final bool sourceCode;
+  final bool archives;
+  final ValueChanged<bool> onVisualAssetsChanged;
+  final ValueChanged<bool> onDocumentsChanged;
+  final ValueChanged<bool> onSourceCodeChanged;
+  final ValueChanged<bool> onArchivesChanged;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: const Color(0xFF131313), // surface-container-low
+        color: const Color(0xFF131313),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -26,74 +35,46 @@ class _ExtensionProtocolsCardState extends State<ExtensionProtocolsCard> {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Column(
+            children: const [
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Extension Protocols',
-                    style: TextStyle(
-                      fontFamily: 'Manrope',
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                    ),
+                    style: TextStyle(fontFamily: 'Manrope', fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'Automatically categorize files based on their type.',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 14,
-                      color: Color(0xFFACABAA),
-                    ),
-                  )
+                    'These toggles are now saved in the local organizer rules table.',
+                    style: TextStyle(fontFamily: 'Inter', fontSize: 14, color: Color(0xFFACABAA)),
+                  ),
                 ],
               ),
-              const Icon(Icons.auto_awesome, color: Color(0xFFAEC6FF), size: 30),
+              Icon(Icons.auto_awesome, color: Color(0xFFAEC6FF), size: 30),
             ],
           ),
           const SizedBox(height: 32),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth > 600) {
-                return Row(
-                  children: [
-                    Expanded(child: _buildItem('Visual Assets', '.jpg, .png, .svg', Icons.image, const Color(0xFFAEC6FF), _visualAssets, (v) => setState(() => _visualAssets = v))),
-                    const SizedBox(width: 16),
-                    Expanded(child: _buildItem('Documents', '.pdf, .docx, .txt', Icons.description, const Color(0xFF8FA0AA), _documents, (v) => setState(() => _documents = v))),
-                  ],
-                );
-              }
-              return Column(
-                children: [
-                  _buildItem('Visual Assets', '.jpg, .png, .svg', Icons.image, const Color(0xFFAEC6FF), _visualAssets, (v) => setState(() => _visualAssets = v)),
-                  const SizedBox(height: 16),
-                  _buildItem('Documents', '.pdf, .docx, .txt', Icons.description, const Color(0xFF8FA0AA), _documents, (v) => setState(() => _documents = v)),
-                ],
-              );
-            },
-          ),
-          const SizedBox(height: 16),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth > 600) {
-                return Row(
-                  children: [
-                    Expanded(child: _buildItem('Source Code', '.js, .py, .html', Icons.terminal, const Color(0xFFE4DFFF), _sourceCode, (v) => setState(() => _sourceCode = v))),
-                    const SizedBox(width: 16),
-                    Expanded(child: _buildItem('Archives', '.zip, .rar, .7z', Icons.inventory_2, Colors.white, _archives, (v) => setState(() => _archives = v))),
-                  ],
-                );
-              }
-              return Column(
-                children: [
-                  _buildItem('Source Code', '.js, .py, .html', Icons.terminal, const Color(0xFFE4DFFF), _sourceCode, (v) => setState(() => _sourceCode = v)),
-                  const SizedBox(height: 16),
-                  _buildItem('Archives', '.zip, .rar, .7z', Icons.inventory_2, Colors.white, _archives, (v) => setState(() => _archives = v)),
-                ],
-              );
-            },
+          Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            children: [
+              SizedBox(
+                width: 380,
+                child: _buildItem('Visual Assets', '.jpg, .png, .svg', Icons.image, const Color(0xFFAEC6FF), visualAssets, onVisualAssetsChanged),
+              ),
+              SizedBox(
+                width: 380,
+                child: _buildItem('Documents', '.pdf, .docx, .txt', Icons.description, const Color(0xFF8FA0AA), documents, onDocumentsChanged),
+              ),
+              SizedBox(
+                width: 380,
+                child: _buildItem('Source Code', '.js, .py, .html, .dart', Icons.terminal, const Color(0xFFE4DFFF), sourceCode, onSourceCodeChanged),
+              ),
+              SizedBox(
+                width: 380,
+                child: _buildItem('Archives', '.zip, .rar, .7z', Icons.inventory_2, Colors.white, archives, onArchivesChanged),
+              ),
+            ],
           ),
         ],
       ),
@@ -104,7 +85,7 @@ class _ExtensionProtocolsCardState extends State<ExtensionProtocolsCard> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0E0E0E), // surface
+        color: const Color(0xFF0E0E0E),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -123,24 +104,18 @@ class _ExtensionProtocolsCardState extends State<ExtensionProtocolsCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontFamily: 'Inter', fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
-                ),
-                Text(
-                  subtitle,
-                  style: const TextStyle(fontFamily: 'Inter', fontSize: 12, color: Color(0xFFACABAA)),
-                )
+                Text(title, style: const TextStyle(fontFamily: 'Inter', fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white)),
+                Text(subtitle, style: const TextStyle(fontFamily: 'Inter', fontSize: 12, color: Color(0xFFACABAA))),
               ],
             ),
           ),
           Switch(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: const Color(0xFF003D8A), // on-primary
-            activeTrackColor: const Color(0xFFAEC6FF), // primary
-            inactiveTrackColor: const Color(0xFF252626), // surface-variant
-          )
+            activeThumbColor: const Color(0xFF003D8A),
+            activeTrackColor: const Color(0xFFAEC6FF),
+            inactiveTrackColor: const Color(0xFF252626),
+          ),
         ],
       ),
     );

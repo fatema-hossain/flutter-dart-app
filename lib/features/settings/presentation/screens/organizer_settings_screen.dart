@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/state/file_zen_scope.dart';
+import '../../../../data/controllers/file_zen_controller.dart';
+import '../../../../data/models/organizer_rules.dart';
+import '../widgets/conflict_resolution_settings.dart';
 import '../widgets/extension_protocols_card.dart';
 import '../widgets/temporal_logic_picker.dart';
-import '../widgets/conflict_resolution_settings.dart';
-
-import 'package:go_router/go_router.dart';
 
 class OrganizerSettingsScreen extends StatelessWidget {
   const OrganizerSettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = FileZenScope.of(context);
+    final rules = controller.rules;
+    if (rules == null) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF0E0E0E),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E0E), // background
+      backgroundColor: const Color(0xFF0E0E0E),
       appBar: AppBar(
         backgroundColor: const Color(0xFF0E0E0E),
         elevation: 0,
@@ -22,100 +33,69 @@ class OrganizerSettingsScreen extends StatelessWidget {
         ),
         title: const Text(
           'FileZen',
-          style: TextStyle(
-            fontFamily: 'Manrope',
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
+          style: TextStyle(fontFamily: 'Manrope', fontWeight: FontWeight.w600, color: Colors.white),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              backgroundColor: const Color(0xFF2E3E45), // secondary-container
-              radius: 16,
-              child: const Icon(Icons.person, color: Color(0xFFB1C2CB), size: 16),
-            ),
-          )
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 48, 24, 120),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 896), // max-w-4xl roughly
+            constraints: const BoxConstraints(maxWidth: 896),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
                   'Organizer',
-                  style: TextStyle(
-                    fontFamily: 'Manrope',
-                    fontSize: 48,
-                    fontWeight: FontWeight.w300,
-                    letterSpacing: -1.0,
-                    color: Colors.white, // on-surface
-                  ),
+                  style: TextStyle(fontFamily: 'Manrope', fontSize: 48, fontWeight: FontWeight.w300, letterSpacing: -1.0, color: Colors.white),
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Define the logic for your automated digital vault.',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 18,
-                    color: Color(0xFFACABAA), // on-surface-variant
-                  ),
+                  'These controls now load and save organizer rules through the local database.',
+                  style: TextStyle(fontFamily: 'Inter', fontSize: 18, color: Color(0xFFACABAA)),
                 ),
                 const SizedBox(height: 48),
-                
-                // Content Blocks
-                const ExtensionProtocolsCard(),
+                ExtensionProtocolsCard(
+                  visualAssets: rules.visualAssetsEnabled,
+                  documents: rules.documentsEnabled,
+                  sourceCode: rules.sourceCodeEnabled,
+                  archives: rules.archivesEnabled,
+                  onVisualAssetsChanged: (value) => _save(context, controller, rules.copyWith(visualAssetsEnabled: value)),
+                  onDocumentsChanged: (value) => _save(context, controller, rules.copyWith(documentsEnabled: value)),
+                  onSourceCodeChanged: (value) => _save(context, controller, rules.copyWith(sourceCodeEnabled: value)),
+                  onArchivesChanged: (value) => _save(context, controller, rules.copyWith(archivesEnabled: value)),
+                ),
                 const SizedBox(height: 32),
-                const TemporalLogicPicker(),
+                TemporalLogicPicker(
+                  inactivityDays: rules.inactivityDays,
+                  createdFrom: rules.createdFrom,
+                  createdTo: rules.createdTo,
+                  onInactivityChanged: (value) => _save(context, controller, rules.copyWith(inactivityDays: value), showSnackBar: false),
+                ),
                 const SizedBox(height: 32),
-                const ConflictResolutionSettings(),
-                
-                const SizedBox(height: 48),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFFACABAA), // on-surface-variant
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      ),
-                      child: const Text('Discard changes'),
-                    ),
-                    const SizedBox(width: 16),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFAEC6FF), // primary
-                        foregroundColor: const Color(0xFF003D8A), // on-primary
-                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                        elevation: 4,
-                        shadowColor: const Color(0xFFAEC6FF).withValues(alpha: 0.5),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                      ),
-                      child: const Text('Apply Protocols', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                  ],
+                ConflictResolutionSettings(
+                  appendTimestamps: rules.appendTimestamps,
+                  defaultStrategy: rules.defaultStrategy,
+                  onAppendTimestampsChanged: (value) => _save(context, controller, rules.copyWith(appendTimestamps: value)),
                 ),
               ],
             ),
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: const Color(0xFFAEC6FF), // primary
-        foregroundColor: const Color(0xFF003D8A), // on-primary
-        elevation: 12,
-        child: const Icon(Icons.add, size: 30),
-      ),
     );
+  }
+
+  Future<void> _save(
+    BuildContext context,
+    FileZenController controller,
+    OrganizerRules rules, {
+    bool showSnackBar = true,
+  }) async {
+    await controller.updateRules(rules);
+    if (showSnackBar && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Organizer rules saved')),
+      );
+    }
   }
 }

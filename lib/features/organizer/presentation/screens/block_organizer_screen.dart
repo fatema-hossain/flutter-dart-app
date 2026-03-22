@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../widgets/project_blocks_grid.dart';
 import '../widgets/timeline_view_header.dart';
 import '../widgets/day_tabs_selector.dart';
@@ -33,9 +34,9 @@ class BlockOrganizerScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => context.go('/settings'),
         backgroundColor: const Color(0xFFAEC6FF),
-        child: const Icon(Icons.add, color: Color(0xFF003D8A), size: 30),
+        child: const Icon(Icons.tune, color: Color(0xFF003D8A), size: 30),
       ),
     );
   }

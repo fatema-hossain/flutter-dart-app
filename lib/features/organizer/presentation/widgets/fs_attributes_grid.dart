@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class FsAttributesGrid extends StatelessWidget {
   final bool isImmutable;
@@ -22,6 +23,8 @@ class FsAttributesGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final numberFormat = NumberFormat('#,###', 'en_US');
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -66,7 +69,7 @@ class FsAttributesGrid extends StatelessWidget {
                 ),
               ),
               Text(
-                '284,556,122',
+                numberFormat.format(inodeNumber),
                 style: const TextStyle(
                   fontFamily: 'monospace',
                   fontSize: 12,

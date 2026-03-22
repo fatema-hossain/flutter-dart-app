@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/state/file_zen_scope.dart';
+
 class ProjectBlocksGrid extends StatelessWidget {
   const ProjectBlocksGrid({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = FileZenScope.of(context);
+    final selectedBlock = controller.selectedBlock;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -22,7 +27,7 @@ class ProjectBlocksGrid extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         const Text(
-          'Systematic categorization of your digital assets. Organized by chronological priority and thematic relevance.',
+          'Blocks are now stored records. Tap a block to filter the timeline by that category.',
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 18,
@@ -34,167 +39,96 @@ class ProjectBlocksGrid extends StatelessWidget {
           spacing: 24,
           runSpacing: 24,
           children: [
-            // Active Block
-            Container(
-              constraints: const BoxConstraints(maxWidth: 800),
-              height: 400,
-              decoration: BoxDecoration(
-                color: const Color(0xFF191A1A),
+            for (final block in controller.blocks)
+              InkWell(
+                onTap: () => controller.selectBlock(block.id),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF484848).withValues(alpha: 0.15)),
-              ),
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            const Color(0xFFAEC6FF).withValues(alpha: 0.1),
-                            Colors.transparent,
-                          ],
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 380),
+                  width: 380,
+                  padding: const EdgeInsets.all(28),
+                  decoration: BoxDecoration(
+                    color: selectedBlock?.id == block.id ? block.color.withValues(alpha: 0.1) : const Color(0xFF131313),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: selectedBlock?.id == block.id
+                          ? block.color.withValues(alpha: 0.35)
+                          : const Color(0xFF484848).withValues(alpha: 0.15),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            block.label,
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1.8,
+                              color: block.color,
+                            ),
+                          ),
+                          Icon(block.icon, color: block.color),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        block.name,
+                        style: const TextStyle(
+                          fontFamily: 'Manrope',
+                          fontSize: 28,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(40),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'PRIMARY ARCHIVE',
-                                  style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFFAEC6FF),
-                                    letterSpacing: 2.0,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'Q4 Marketing Campaign',
-                                  style: TextStyle(
-                                    fontFamily: 'Manrope',
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Icon(Icons.auto_awesome, color: Color(0xFFAEC6FF), size: 30),
-                          ],
+                      const SizedBox(height: 8),
+                      Text(
+                        block.description,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 14,
+                          height: 1.5,
+                          color: Color(0xFFACABAA),
                         ),
-                        const Spacer(),
-                        Wrap(
-                          spacing: 12,
-                          runSpacing: 12,
-                          alignment: WrapAlignment.start,
-                          children: [
-                            _buildDayPreview('MON', '12', false),
-                            _buildDayPreview('TUE', '08', false),
-                            _buildDayPreview('WED', '24', true),
-                            _buildDayPreview('THU', '15', false),
-                            _buildDayPreview('FRI', '04', false),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Side Block 1
-            Container(
-              constraints: const BoxConstraints(maxWidth: 400),
-              height: 400,
-              padding: const EdgeInsets.all(32),
-              decoration: BoxDecoration(
-                color: const Color(0xFF131313),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF484848).withValues(alpha: 0.15)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.cloud_done, color: Color(0xFFE4DFFF), size: 24),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Cloud Assets',
-                    style: TextStyle(
-                      fontFamily: 'Manrope',
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'External repositories synchronized for local processing.',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 14,
-                      color: Color(0xFFACABAA),
-                      height: 1.5,
-                    ),
-                  ),
-                  const Spacer(),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Storage Capacity', style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: Color(0xFFACABAA))),
-                      Text('82% Full', style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: Color(0xFFACABAA))),
+                      ),
+                      const SizedBox(height: 28),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          for (final day in controller.dayGroups.where((group) => group.blockId == block.id))
+                            _buildDayPreview(
+                              day.weekday.substring(0, 3).toUpperCase(),
+                              controller.files.where((file) => file.dayGroupId == day.id).length.toString().padLeft(2, '0'),
+                              controller.selectedWeekday == day.weekday && selectedBlock?.id == block.id,
+                              block.color,
+                            ),
+                        ],
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  Container(
-                    height: 8,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2E3E45),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: FractionallySizedBox(
-                      alignment: Alignment.centerLeft,
-                      widthFactor: 0.82,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFAEC6FF), Color(0xFFE4DFFF)],
-                          ),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildDayPreview(String day, String number, bool isActive) {
+  Widget _buildDayPreview(String day, String number, bool isActive, Color accent) {
     return Container(
-      width: 64,
-      height: 72,
+      width: 68,
+      height: 74,
       decoration: BoxDecoration(
-        color: const Color(0xFF131313),
-        borderRadius: BorderRadius.circular(8),
-        border: isActive ? const Border(bottom: BorderSide(color: Color(0xFFAEC6FF), width: 2)) : null,
+        color: const Color(0xFF191A1A),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: isActive ? accent.withValues(alpha: 0.35) : Colors.transparent,
+        ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -204,8 +138,8 @@ class ProjectBlocksGrid extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 10,
-              fontWeight: FontWeight.w500,
-              color: isActive ? const Color(0xFFAEC6FF) : const Color(0xFFACABAA),
+              fontWeight: FontWeight.w600,
+              color: isActive ? accent : const Color(0xFFACABAA),
             ),
           ),
           const SizedBox(height: 4),
@@ -213,9 +147,9 @@ class ProjectBlocksGrid extends StatelessWidget {
             number,
             style: TextStyle(
               fontFamily: 'Manrope',
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: isActive ? const Color(0xFFAEC6FF) : Colors.white,
+              color: isActive ? accent : Colors.white,
             ),
           ),
         ],

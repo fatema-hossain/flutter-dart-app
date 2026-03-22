@@ -1,0 +1,9 @@
+{
+  "name": "FileZen",
+  "short_name": "FileZen",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0E0E0E",
+  "theme_color": "#0E0E0E",
+  "description": "Cross-platform file organizer demo"
+}

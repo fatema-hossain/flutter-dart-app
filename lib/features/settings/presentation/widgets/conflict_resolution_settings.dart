@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 
-class ConflictResolutionSettings extends StatefulWidget {
-  const ConflictResolutionSettings({super.key});
+class ConflictResolutionSettings extends StatelessWidget {
+  const ConflictResolutionSettings({
+    super.key,
+    required this.appendTimestamps,
+    required this.defaultStrategy,
+    required this.onAppendTimestampsChanged,
+  });
 
-  @override
-  State<ConflictResolutionSettings> createState() => _ConflictResolutionSettingsState();
-}
-
-class _ConflictResolutionSettingsState extends State<ConflictResolutionSettings> {
-  bool _appendTimestamps = true;
+  final bool appendTimestamps;
+  final String defaultStrategy;
+  final ValueChanged<bool> onAppendTimestampsChanged;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: const Color(0xFF191A1A).withValues(alpha: 0.5), // surface-container with opacity
+        color: const Color(0xFF191A1A).withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFF484848).withValues(alpha: 0.05)),
       ),
@@ -27,20 +29,13 @@ class _ConflictResolutionSettingsState extends State<ConflictResolutionSettings>
             height: 48,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFFAEC6FF), Color(0xFF0C4492)], // primary to primary-container
+                colors: [Color(0xFFAEC6FF), Color(0xFF0C4492)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                )
-              ],
             ),
-            child: const Icon(Icons.gavel, color: Color(0xFF003D8A)), // on-primary
+            child: const Icon(Icons.gavel, color: Color(0xFF003D8A)),
           ),
           const SizedBox(width: 24),
           Expanded(
@@ -49,27 +44,18 @@ class _ConflictResolutionSettingsState extends State<ConflictResolutionSettings>
               children: [
                 const Text(
                   'Conflict Resolution',
-                  style: TextStyle(
-                    fontFamily: 'Manrope',
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontFamily: 'Manrope', fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'How should FileZen handle duplicate filenames during migration?',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 14,
-                    color: Color(0xFFACABAA),
-                  ),
+                  'Duplicate handling preferences are now persisted and reused across report generation.',
+                  style: TextStyle(fontFamily: 'Inter', fontSize: 14, color: Color(0xFFACABAA)),
                 ),
                 const SizedBox(height: 24),
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.black, // surface-container-lowest
+                    color: Colors.black,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -79,26 +65,21 @@ class _ConflictResolutionSettingsState extends State<ConflictResolutionSettings>
                         children: [
                           const Row(
                             children: [
-                              Icon(Icons.history, color: Color(0xFFE4DFFF)), // tertiary
+                              Icon(Icons.history, color: Color(0xFFE4DFFF)),
                               SizedBox(width: 12),
                               Text(
                                 'Append timestamps to duplicates',
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white,
-                                ),
+                                style: TextStyle(fontFamily: 'Inter', fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white),
                               ),
                             ],
                           ),
                           Switch(
-                            value: _appendTimestamps,
-                            onChanged: (val) => setState(() => _appendTimestamps = val),
+                            value: appendTimestamps,
+                            onChanged: onAppendTimestampsChanged,
                             activeThumbColor: const Color(0xFF003D8A),
                             activeTrackColor: const Color(0xFFAEC6FF),
                             inactiveTrackColor: const Color(0xFF252626),
-                          )
+                          ),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -112,43 +93,36 @@ class _ConflictResolutionSettingsState extends State<ConflictResolutionSettings>
                           children: [
                             const Text(
                               'Default Resolution Strategy',
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontSize: 12,
-                                color: Color(0xFFACABAA),
-                              ),
+                              style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: Color(0xFFACABAA)),
                             ),
                             const SizedBox(height: 12),
                             Container(
+                              width: double.infinity,
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1F2020), // surface-container-high
+                                color: const Color(0xFF1F2020),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Create unique version (v2, v3...)',
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontSize: 14,
-                                      color: Colors.white,
-                                    ),
+                                    defaultStrategy,
+                                    style: const TextStyle(fontFamily: 'Inter', fontSize: 14, color: Colors.white),
                                   ),
-                                  Icon(Icons.expand_more, color: Color(0xFFACABAA)),
+                                  const Icon(Icons.check_circle, color: Color(0xFFAEC6FF), size: 18),
                                 ],
                               ),
-                            )
+                            ),
                           ],
                         ),
-                      )
+                      ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

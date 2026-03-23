@@ -19,7 +19,12 @@ class BlockRecord {
 
   IconData get icon => IconData(iconCodePoint, fontFamily: 'MaterialIcons');
 
-  Color get color => Color(int.decode(colorHex));
+  Color get color => Color(
+        int.parse(
+          colorHex.startsWith('0x') ? colorHex.substring(2) : colorHex,
+          radix: 16,
+        ),
+      );
 
   Map<String, Object?> toMap() {
     return {

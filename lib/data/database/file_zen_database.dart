@@ -332,7 +332,7 @@ class FileZenDatabase {
   }
 
   _SeedData _buildSeedData() {
-    const blocks = <BlockRecord>[
+    final blocks = <BlockRecord>[
       BlockRecord(
         id: 1,
         name: 'Primary Archive',
